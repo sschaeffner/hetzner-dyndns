@@ -131,8 +131,8 @@ if __name__ == '__main__':
     actual_a = get_actual_a()
     logger.info(f"actual IPv4: {actual_a}")
 
-    actual_aaaa = get_actual_aaaa()
-    logger.info(f"actual IPv6: {actual_aaaa}")
+    # actual_aaaa = get_actual_aaaa()
+    # logger.info(f"actual IPv6: {actual_aaaa}")
 
     logger.info(f"current A (from DNS) is {current_a}, actual A is {actual_a}")
 
