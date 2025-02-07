@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+import time
 
 import dns
 from loguru import logger
@@ -128,11 +129,27 @@ if __name__ == '__main__':
     logger.debug(f"current A: {current_a}")
     logger.debug(f"current AAAA: {current_aaaa}")
 
-    actual_a = get_actual_a()
-    logger.info(f"actual IPv4: {actual_a}")
+    actual_a = None
+    try_nr = 0
+    while actual_a is None and try_nr < 5:
+        try_nr += 1
+        try:
+            actual_a = get_actual_a()
+            logger.debug(f"actual IPv4: {actual_a}")
+        except RuntimeError as e:
+            logger.warning(f"error while getting IPv4: {e}")
+            time.sleep(1)
 
-    # actual_aaaa = get_actual_aaaa()
-    # logger.info(f"actual IPv6: {actual_aaaa}")
+    # actual_aaaa = None
+    # try_nr = 0
+    # while actual_aaaa is None and try_nr < 5:
+    #     try_nr += 1
+    #     try:
+    #         actual_aaaa = get_actual_aaaa()
+    #         logger.debug(f"actual IPv6: {actual_aaaa}")
+    #     except RuntimeError as e:
+    #         logger.warning(f"error while getting IPv6: {e}")
+    #         time.sleep(1)
 
     logger.info(f"current A (from DNS) is {current_a}, actual A is {actual_a}")
 
