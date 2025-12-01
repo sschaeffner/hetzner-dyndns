@@ -9,7 +9,8 @@ import dns
 from loguru import logger
 
 from dns_query import get_soa_mname, resolve
-from hetzner import HetznerDns, HetznerIp
+from hetzner import HetznerIp
+from hclouddns import HcloudDns
 
 
 def find_or_none(iterable):
@@ -19,47 +20,11 @@ def find_or_none(iterable):
 
 
 def set_a(zone_name: str, domain: str, a: str, ttl: int | None = None):
-    hetzner = HetznerDns(token)
-
-    zone_id = hetzner.get_zone_id(zone_name)
-    logger.debug("zone id: {}", zone_id)
-
-    records = hetzner.get_records(zone_id)
-    logger.debug("current records as json: {}", json.dumps(records))
-
     name = domain.split(zone_name)[0][:-1]
     logger.debug(f"calculated name: {name}")
 
-    existing_a_record = find_or_none(
-        record
-        for record
-        in records
-        if record["name"] == name
-        and record["type"] == "A"
-    )
-    if existing_a_record:
-        logger.debug(f"existing A record: {existing_a_record}")
-        if existing_a_record["value"] != a:
-            logger.info("Updating existing A record...")
-            hetzner.update_record(
-                existing_a_record["id"],
-                zone_id,
-                name,
-                a,
-                "A",
-                ttl
-            )
-        else:
-            logger.warning("Existing A record already matches desired A")
-    else:
-        logger.info("No existing A record found. Creating new one...")
-        hetzner.create_record(
-            zone_id,
-            name,
-            a,
-            "A",
-            ttl
-        )
+    hc = HcloudDns(token)
+    hc.set_record(zone_name, name, a, ttl)
 
 
 def get_current(qname: str) -> tuple[str | None, str | None]:
