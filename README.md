@@ -1,4 +1,4 @@
-# Hetzner Dynamic DNS
+# Hetzner Cloud Dynamic DNS
 
 A Python script for updating a DNS A record to be the running host's public IPv4 address. Run regularly, e.g., as a
 Kubernetes CronJob.
@@ -17,6 +17,7 @@ spec:
   schedule: "*/5 * * * *"
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 120
       template:
         spec:
           containers:
@@ -27,7 +28,7 @@ spec:
                 - name: TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: hetzner-dns-secret
+                      name: hcloud-api-key
                       key: api-key
                 - name: ZONE_NAME
                   value: example.com
@@ -40,8 +41,8 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: hetzner-dns-secret
+  name: hcloud-api-key
 type: Opaque
 stringData:
-  api-key: "TODO-PUT-YOUR-HETZNER-DNS-API-KEY-HERE"
+  api-key: "TODO-PUT-YOUR-HETZNER-CLOUD-API-KEY-HERE"
 ```
